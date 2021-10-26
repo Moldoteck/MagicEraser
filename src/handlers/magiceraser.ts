@@ -76,13 +76,13 @@ export async function processPhoto(ctx: Context) {
               `dataset.img_suffix=.jpg`])
 
           pythonProcess2.stdout.on('data', async (data) => {
-            // console.log(`stdout2: ${data}`);
+            console.log(`stdout2: ${data}`);
             await ctx.replyWithChatAction('typing')
           });
 
-          // pythonProcess2.stderr.on('data', (data) => {
-          //   console.error(`stderr2: ${data}`);
-          // });
+          pythonProcess2.stderr.on('data', (data) => {
+            console.error(`stderr2: ${data}`);
+          });
 
           pythonProcess2.on('close', (code) => {
             console.log(`Finished painting for ${usr_dir} with code ${code}`)
