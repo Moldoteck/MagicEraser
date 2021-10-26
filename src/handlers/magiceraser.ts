@@ -46,7 +46,7 @@ export async function processPhoto(ctx: Context) {
       }
       ctx.replyWithChatAction('typing')
       console.log(`Starting mask extraction for ${usr_dir}`)
-      const pythonProcess = spawn('python',
+      const pythonProcess = spawn('python3',
         ["./lama/bin/mask.py",
           `${usr_dir}`,
           `f_1_mask.jpg`,
@@ -68,7 +68,7 @@ export async function processPhoto(ctx: Context) {
           fs.copyFile(`${usr_dir}/f_1_mask.png`, `${usr_dir}/out/f_1_mask.png`, (err) => { })
           ctx.replyWithChatAction('typing')
           console.log(`Starting painting for ${usr_dir}`)
-          const pythonProcess2 = spawn('python',
+          const pythonProcess2 = spawn('python3',
             ["./lama/bin/predict.py",
               `model.path=${process.cwd()}/lama/big-lama`,
               `indir=${process.cwd()}/${usr_dir.substring(1)}/out`,
