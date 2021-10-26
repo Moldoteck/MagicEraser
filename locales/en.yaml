@@ -1,5 +1,8 @@
 name: English
 help: |
-  <b>Bot</b> allows you to see how Telegraf bots can be built.
+  <b>Bot</b> allows you to delete objects from photos.
+  Firstly send an original image
+  Edit that image by coloring objects that you want to delete(Telegram has an built-in function for this)
+  Send the second image as a reply to first image
 language: Please, select the language.
 language_selected: <b>Bot</b> now speaks English.
