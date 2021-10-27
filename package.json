@@ -18,7 +18,10 @@
     "@types/mongoose": "^5.10.18",
     "@types/node": "^15.12.1",
     "concurrently": "^6.2.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "ansi-regex": ">=5.0.1",
+    "mpath": ">=0.8.4",
+    "mquery": ">=3.2.3"
   },
   "dependencies": {
     "@typegoose/typegoose": "^7.6.1",

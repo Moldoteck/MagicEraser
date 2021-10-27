@@ -11,9 +11,9 @@ help: |
   <b>Send /language</b> to change language
 language: Please, select the language.
 language_selected: <b>Bot</b> now speaks English.
-first_image: Исходное изображение сохранено. Теперь нарисуйте то, что вы хотите удалить, и отправьте результат в ответ.
-unsupported_file: Файлы сейчас не поддерживаются. Будьте на связи!
-wait_task: Дождитесь завершения предыдущей задачи!
-painting_error: Ошибка во время обработки, повторите попытку позже
-queue_task: Задача добавлена ​​в очередь ...
-Execution_task: Начато выполнение ...
+first_image: Original image saved. Now draw what you want to remove and send the result as a reply
+unsupported_file: Files are unsupported now. Stay tuned!
+wait_task: Wait until previous task is finished!
+painting_error: Error during painting, try again later
+queue_task: Task added to queue...
+execution_task: Started execution...
