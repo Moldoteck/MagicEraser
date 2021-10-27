@@ -1,4 +1,4 @@
-import { exec, spawn } from 'child_process'
+import { spawn } from 'child_process'
 import { writeFile } from 'fs'
 import { Context } from 'telegraf'
 const fs = require('fs')
@@ -6,6 +6,7 @@ const needle = require('needle')
 const queue = require('queue')
 const q = queue({ concurrency: 5, autostart: true })
 q.start()
+var processingLimit = 1
 
 async function get_file(ctx: Context) {
   if ('document' in ctx.message && (ctx.message.document.mime_type == 'image/png' || ctx.message.document.mime_type == 'image/jpeg')) {
@@ -24,10 +25,10 @@ async function delete_task_user(ctx: Context) {
 }
 
 async function process_image(ctx: Context, usr_dir: string) {
-  let msg = await ctx.reply('Task added to queue...')
+  let msg = await ctx.reply(`${ctx.i18n.t('queue_task')}`)
   q.push(async (cb) => {
     try { ctx.deleteMessage(msg.message_id) } catch (e) { }
-    ctx.reply('Started execution...')
+    let msgexec = await ctx.reply(`${ctx.i18n.t('execution_task')}`)
     console.log('' + usr_dir)
     console.log('' + process.cwd())
     const pythonProcess = spawn('python3',
@@ -56,16 +57,17 @@ async function process_image(ctx: Context, usr_dir: string) {
             `outdir=${process.cwd()}/${usr_dir.substring(1)}/out`,
             `dataset.img_suffix=.jpg`])
 
-        // pythonProcess2.stdout.on('data', async (data) => {
-        //   console.log(`stdout2: ${data}`);
-        //   await ctx.replyWithChatAction('typing')
-        // });
+        pythonProcess2.stdout.on('data', async (data) => {
+          console.log(`stdout2: ${data}`);
+          await ctx.replyWithChatAction('typing')
+        });
         pythonProcess2.stderr.on('data', (data) => {
           console.error(`stderr2: ${data}`);
         });
 
         pythonProcess2.on('close', async (code) => {
           console.log(`Finished painting for ${usr_dir} with code ${code}`)
+          try { ctx.deleteMessage(msgexec.message_id) } catch (e) { }
           if (code == 0) {
             try {
               ctx.replyWithChatAction('upload_document')
@@ -78,13 +80,13 @@ async function process_image(ctx: Context, usr_dir: string) {
               cb()
             }
           } else {
-            ctx.reply('Error during painting, try again later', { reply_to_message_id: ctx.message.message_id })
+            ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id })
             await delete_task_user(ctx)
             cb()
           }
         })
       } else {
-        ctx.reply('Error during painting, try again later', { reply_to_message_id: ctx.message.message_id })
+        ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id })
         await delete_task_user(ctx)
         cb()
       }
@@ -93,15 +95,15 @@ async function process_image(ctx: Context, usr_dir: string) {
 }
 
 export async function processPhoto(ctx: Context) {
-  if (ctx.dbuser.jobs.length >= 1) {
-    ctx.reply('Wait until previous task is finished!')
+  if (ctx.dbuser.jobs.length >= processingLimit) {
+    ctx.reply(`${ctx.i18n.t('wait_task')}`)
     return
   }
 
   let file = await get_file(ctx)
   if (file) {
     if ('document' in ctx.message && ctx.dbuser.id != 180001222) {
-      ctx.reply('Files are unsupported now. Stay tuned!')
+      ctx.reply(`${ctx.i18n.t('unsupported_file')}`)
       return
     }
     let result = await needle('get', `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`)
@@ -122,7 +124,7 @@ export async function processPhoto(ctx: Context) {
     await writeFile(`${f_fin}`, result.body, () => { })
 
     if (f_fin == f2) {
-      if (ctx.dbuser.jobs.length < 1) {
+      if (ctx.dbuser.jobs.length < processingLimit) {
         let user = ctx.dbuser
         user.jobs.unshift(Date.now())
         user = await (user as any).save()
@@ -138,7 +140,16 @@ export async function processPhoto(ctx: Context) {
         await process_image(ctx, usr_dir)
       }
     } else {
-      ctx.reply('Original image saved. Now draw what you want to remove and send the result as a reply', { reply_to_message_id: ctx.message.message_id })
+      ctx.reply(`${ctx.i18n.t('first_image')}`, { reply_to_message_id: ctx.message.message_id })
+    }
+  }
+}
+
+export async function setProcessLimit(ctx: Context) {
+  if (ctx.dbuser.id == 180001222) {
+    if ('text' in ctx.message) {
+      processingLimit = parseInt(ctx.message.text)
+      ctx.reply(`Processing limit set to ${processingLimit}`)
     }
   }
 }
