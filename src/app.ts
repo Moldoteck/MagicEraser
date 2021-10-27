@@ -11,7 +11,8 @@ import { sendHelp } from '@/handlers/sendHelp'
 import { i18n, attachI18N } from '@/helpers/i18n'
 import { setLanguage, sendLanguage } from '@/handlers/language'
 import { attachUser } from '@/middlewares/attachUser'
-import { processPhoto, processPhotoSv } from './handlers/magiceraser'
+import { processPhoto } from './handlers/magiceraser'
+import { emptyLimits } from './models'
 
 // Middlewares
 bot.use(ignoreOldMessageUpdates)
@@ -22,12 +23,13 @@ bot.command(['help', 'start'], sendHelp)
 bot.command('language', sendLanguage)
 
 bot.on('photo',processPhoto)
-// bot.on('message',processPhoto)
+bot.on('message',processPhoto)
 // Actions
 bot.action(localeActions, setLanguage)
 // Errors
 bot.catch(console.error)
 // Start bot
-bot.launch().then(() => {
+bot.launch().then(async () => {
+  await emptyLimits()
   console.info(`Bot ${bot.botInfo.username} is up and running`)
 })
