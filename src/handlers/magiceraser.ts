@@ -8,6 +8,24 @@ const q = queue({ concurrency: 5, autostart: true })
 q.start()
 var processingLimit = 1
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function chatAction(ctx: Context) {
+  while (true) {
+    try {
+      await ctx.replyWithChatAction('typing')
+    } catch (e) { console.log(e) }
+    await sleep(4000)
+    if (ctx.dbuser.jobs.length == 0) {
+      break
+    }
+  }
+}
+
 async function get_file(ctx: Context) {
   if ('document' in ctx.message && (ctx.message.document.mime_type == 'image/png' || ctx.message.document.mime_type == 'image/jpeg')) {
     return await ctx.telegram.getFile(ctx.message.document.file_id)
@@ -48,7 +66,6 @@ async function process_image(ctx: Context, usr_dir: string) {
       if (code == 0) {
         fs.copyFile(`${usr_dir}/f_1.jpg`, `${usr_dir}/out/f_1.jpg`, (err) => { })
         fs.copyFile(`${usr_dir}/f_1_mask.png`, `${usr_dir}/out/f_1_mask.png`, (err) => { })
-        ctx.replyWithChatAction('typing')
         console.log(`Starting painting for ${usr_dir}`)
         const pythonProcess2 = spawn('python3',
           ["./lama/bin/predict.py",
@@ -58,11 +75,10 @@ async function process_image(ctx: Context, usr_dir: string) {
             `dataset.img_suffix=.jpg`])
 
         pythonProcess2.stdout.on('data', async (data) => {
-          console.log(`stdout2: ${data}`);
-          await ctx.replyWithChatAction('typing')
+          console.log(`stdout2: ${data}`)
         });
         pythonProcess2.stderr.on('data', (data) => {
-          console.error(`stderr2: ${data}`);
+          console.error(`stderr2: ${data}`)
         });
 
         pythonProcess2.on('close', async (code) => {
@@ -125,6 +141,11 @@ export async function processPhoto(ctx: Context) {
 
     if (f_fin == f2) {
       if (ctx.dbuser.jobs.length < processingLimit) {
+
+        if (ctx.dbuser.jobs.length == 0) {
+          chatAction(ctx)
+        }
+
         let user = ctx.dbuser
         user.jobs.unshift(Date.now())
         user = await (user as any).save()
@@ -134,7 +155,6 @@ export async function processPhoto(ctx: Context) {
         if (!fs.existsSync(out_dir)) {
           fs.mkdirSync(out_dir);
         }
-        ctx.replyWithChatAction('typing')
         console.log(`Starting mask extraction for ${usr_dir}`)
 
         await process_image(ctx, usr_dir)
