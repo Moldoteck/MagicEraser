@@ -11,7 +11,7 @@ import { sendHelp } from '@/handlers/sendHelp'
 import { i18n, attachI18N } from '@/helpers/i18n'
 import { setLanguage, sendLanguage } from '@/handlers/language'
 import { attachUser } from '@/middlewares/attachUser'
-import { countChats, processPhoto, setProcessLimit } from './handlers/magiceraser'
+import { countAllUsers, processPhoto, setProcessLimit } from './handlers/magiceraser'
 import { emptyLimits } from './models'
 
 // Middlewares
@@ -22,7 +22,7 @@ bot.use(i18n.middleware(), attachI18N)
 bot.command(['help', 'start'], sendHelp)
 bot.command('language', sendLanguage)
 bot.command('limit', setProcessLimit)
-bot.command('countChats', countChats)
+bot.command('countChats', countAllUsers)
 
 bot.on('photo',processPhoto)
 bot.on('message',processPhoto)

@@ -175,9 +175,9 @@ export async function setProcessLimit(ctx: Context) {
   }
 }
 
-export async function countChats(ctx: Context) {
+export async function countAllUsers(ctx: Context) {
   if (ctx.message.from.id == 180001222) {
-    let chats = await countUsers()
-    ctx.reply('Chats ' + chats.length)
+    let users = await countUsers()
+    ctx.reply('Chats ' + users)
   }
 }
