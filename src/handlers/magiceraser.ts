@@ -1,3 +1,4 @@
+import { countUsers } from '@/models/User'
 import { spawn } from 'child_process'
 import { writeFile } from 'fs'
 import { Context } from 'telegraf'
@@ -171,5 +172,12 @@ export async function setProcessLimit(ctx: Context) {
       processingLimit = parseInt(ctx.message.text)
       ctx.reply(`Processing limit set to ${processingLimit}`)
     }
+  }
+}
+
+export async function countChats(ctx: Context) {
+  if (ctx.message.from.id == 180001222) {
+    let chats = await countUsers()
+    ctx.reply('Chats ' + chats.length)
   }
 }

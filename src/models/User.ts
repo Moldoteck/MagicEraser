@@ -33,3 +33,7 @@ export async function findUser(id: number) {
 export async function emptyLimits() {
   await UserModel.updateMany({}, {"$set":{"jobs": []}})
 }
+
+export async function countUsers() {
+  return await UserModel.countDocuments({})
+}
