@@ -1,4 +1,4 @@
-import { countUsers, emptyLimits } from '@/models/User'
+import { countUsers, emptyLimits, findUser } from '@/models/User'
 import { spawn } from 'child_process'
 import { writeFile } from 'fs'
 import { Context } from 'telegraf'
@@ -21,7 +21,8 @@ async function chatAction(ctx: Context) {
       await ctx.replyWithChatAction('typing')
     } catch (e) { console.log(e) }
     await sleep(4000)
-    if (ctx.dbuser.jobs.length == 0) {
+    let usr = await findUser(ctx.from.id)
+    if (usr.jobs.length == 0) {
       break
     }
   }
@@ -186,5 +187,12 @@ export async function countAllUsers(ctx: Context) {
 export async function resetLimits(ctx: Context) {
   if (ctx.message.from.id == 180001222) {
     await emptyLimits()
+  }
+}
+
+export async function getSeg(ctx: Context) {
+  if (ctx.message.from.id == 180001222) {
+    var usr_dir = `./data_folder/${ctx.dbuser.id}`;
+    ctx.replyWithDocument({ source: `${process.cwd()}/${usr_dir.substring(1)}/f_1_mask.png`, filename: 'result.png' })
   }
 }
