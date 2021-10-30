@@ -1,4 +1,4 @@
-import { countUsers } from '@/models/User'
+import { countUsers, emptyLimits } from '@/models/User'
 import { spawn } from 'child_process'
 import { writeFile } from 'fs'
 import { Context } from 'telegraf'
@@ -179,5 +179,12 @@ export async function countAllUsers(ctx: Context) {
   if (ctx.message.from.id == 180001222) {
     let users = await countUsers()
     ctx.reply('Chats ' + users)
+  }
+}
+
+
+export async function resetLimits(ctx: Context) {
+  if (ctx.message.from.id == 180001222) {
+    await emptyLimits()
   }
 }
