@@ -190,9 +190,7 @@ export async function resetLimits(ctx: Context) {
   }
 }
 
-export async function getSeg(ctx: Context) {
-  if (ctx.message.from.id == 180001222) {
-    var usr_dir = `./data_folder/${ctx.dbuser.id}`;
-    ctx.replyWithDocument({ source: `${process.cwd()}/${usr_dir.substring(1)}/f_1_mask.png`, filename: 'result.png' })
-  }
+export async function sendSegmentationResult(ctx: Context) {
+  var usr_dir = `./data_folder/${ctx.dbuser.id}`;
+  ctx.replyWithDocument({ source: `${process.cwd()}/${usr_dir.substring(1)}/f_1_mask_confirm.png`, filename: 'result.png' })
 }
