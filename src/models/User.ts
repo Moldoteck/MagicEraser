@@ -7,8 +7,8 @@ export class User {
   @prop({ required: true, default: 'en' })
   language: string
   
-  @prop({ required: true, default: [] })
-  jobs: Array<Date>
+  @prop({ required: true, default: 0 })
+  jobs: number
 }
 
 // Get User model
@@ -31,7 +31,7 @@ export async function findUser(id: number) {
 }
 
 export async function emptyLimits() {
-  await UserModel.updateMany({}, {"$set":{"jobs": []}})
+  await UserModel.updateMany({}, {"$set":{"jobs": 0}})
 }
 
 export async function countUsers() {
