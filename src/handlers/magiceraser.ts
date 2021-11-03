@@ -77,6 +77,9 @@ async function process_image(ctx: Context, usr_dir: string) {
         `f_mask.jpg`,
         `f.jpg`,
         `${usr_dir}/f_1/in`])
+        pythonProcess.stderr.on('data', (data) => {
+          console.log(`stderr: ${data}`)
+        })
 
     pythonProcess.on('close', async (code) => {
       console.log(`Finished mask extraction for ${usr_dir} with code ${code}`)
