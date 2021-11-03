@@ -7,7 +7,7 @@ const needle = require('needle')
 const queue = require('queue')
 
 
-let workers = 3
+let workers = 1
 
 const q = queue({ concurrency: workers, autostart: true })
 q.start()
