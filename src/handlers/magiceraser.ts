@@ -17,7 +17,7 @@ var workerOccupied = Array(workers).fill(0)
 var workerInit = Array(workers).fill(0)
 var py_process = Array(workers)
 for (let i = 0; i < py_process.length; i++) {
-  py_process[i] = spawn('python',
+  py_process[i] = spawn('python3',
     ["./lama/bin/predict.py",
       `model.path=${process.cwd()}/lama/big-lama`,
       `indir=''`,
@@ -71,7 +71,7 @@ async function process_image(ctx: Context, usr_dir: string) {
     try { await ctx.deleteMessage(msg.message_id) } catch (e) { }
     let msgexec = await ctx.reply(`${ctx.i18n.t('execution_task')}`)
 
-    const pythonProcess = spawn('python',
+    const pythonProcess = spawn('python3',
       ["./lama/bin/mask.py",
         `${usr_dir}/f_1/temp`,
         `f_mask.jpg`,
