@@ -81,6 +81,7 @@ async function process_image(ctx: Context, usr_dir: string) {
           console.log(`out: ${data}`)
         })
         py_process.on('close', async (code) => {
+          console.log(`Finished painting for ${usr_dir} with code ${code}`)
           if (code == 0) {
             try { await ctx.deleteMessage(msgexec.message_id) } catch (e) { }
             try {
