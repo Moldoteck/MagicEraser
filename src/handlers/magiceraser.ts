@@ -68,7 +68,7 @@ async function process_image(ctx: Context, usr_dir: string) {
         console.log(`Starting painting for ${usr_dir}`)
         usr_dir = usr_dir.slice(1)
 
-        let py_process = spawn('LD_PRELOAD=/usr/local/lib/libjemalloc.so python3',
+        let py_process = spawn('python3',
           ["./lama/bin/predict.py",
             `model.path=${process.cwd()}/lama/big-lama`,
             `indir='${process.cwd()}/${usr_dir}/f_1/in/'`,
