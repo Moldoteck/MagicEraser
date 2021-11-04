@@ -77,6 +77,9 @@ async function process_image(ctx: Context, usr_dir: string) {
         py_process.stderr.on('data', async (data) => {
           console.log(`stderr: ${data}`)
         })
+        py_process.stdout.on('data', async (data) => {
+          console.log(`out: ${data}`)
+        })
         py_process.on('close', async (code) => {
           if (code == 0) {
             try { await ctx.deleteMessage(msgexec.message_id) } catch (e) { }
