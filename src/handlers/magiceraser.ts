@@ -6,31 +6,11 @@ const fs = require('fs')
 const needle = require('needle')
 const queue = require('queue')
 
-
 let workers = 1
 
 const q = queue({ concurrency: workers, autostart: true })
 q.start()
 var processingLimit = 1
-
-var workerOccupied = Array(workers).fill(0)
-var workerInit = Array(workers).fill(0)
-var py_process = Array(workers)
-for (let i = 0; i < py_process.length; i++) {
-  py_process[i] = spawn('python3',
-    ["./lama/bin/predict.py",
-      `model.path=${process.cwd()}/lama/big-lama`,
-      `indir=''`,
-      `outdir=''`,
-      `dataset.img_suffix=.jpg`], { windowsVerbatimArguments: true, stdio: ['pipe', 'pipe', 'pipe', 'ipc'] })
-  workerInit[i] = 0
-  py_process[i].stdout.on('data', async (data) => {
-    if (('' + data).includes('init full inpainting')) {
-      console.log('init full inpainting done')
-      workerInit[i] = 1
-    }
-  })
-}
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -77,9 +57,9 @@ async function process_image(ctx: Context, usr_dir: string) {
         `f_mask.jpg`,
         `f.jpg`,
         `${usr_dir}/f_1/in`])
-        pythonProcess.stderr.on('data', (data) => {
-          console.log(`stderr: ${data}`)
-        })
+    pythonProcess.stderr.on('data', (data) => {
+      console.log(`stderr: ${data}`)
+    })
 
     pythonProcess.on('close', async (code) => {
       console.log(`Finished mask extraction for ${usr_dir} with code ${code}`)
@@ -88,31 +68,17 @@ async function process_image(ctx: Context, usr_dir: string) {
         console.log(`Starting painting for ${usr_dir}`)
         usr_dir = usr_dir.slice(1)
 
-        let ind = workerOccupied.findIndex((e) => { return e == 0 })
-        if (ind < 0) {
-          await delete_task_user(ctx)
-          ctx.reply('server error, come back later')
-          cb()
-          return
-        }
-        while (workerInit[ind] == 0) {
-          await sleep(500)
-        }
-
-        if (workerOccupied[ind] == 1) {
-          await delete_task_user(ctx)
-          ctx.reply('a bit busy, try one more time')
-          cb()
-          return
-        }
-        workerOccupied[ind] == 1
-
-        let in_out = [`${process.cwd()}/${usr_dir}/f_1/in/`,
-        `${process.cwd()}/${usr_dir}/f_1/out/`]
-
-        let data_listen = async (data) => {
-          console.log(`${data}`)
-          if (('' + data).includes('done inpainting')) {
+        let py_process = spawn('python3',
+          ["./lama/bin/predict.py",
+            `model.path=${process.cwd()}/lama/big-lama`,
+            `indir='${process.cwd()}/${usr_dir}/f_1/in/'`,
+            `outdir='${process.cwd()}/${usr_dir}/f_1/out/'`,
+            `dataset.img_suffix=.jpg`])
+        py_process.stderr.on('data', async (data) => {
+          console.log(`stderr: ${data}`)
+        })
+        py_process.on('close', async (code) => {
+          if (code == 0) {
             try { await ctx.deleteMessage(msgexec.message_id) } catch (e) { }
             try {
               let myfile = `${process.cwd()}/${usr_dir}/f_1/out/f_mask.png`
@@ -124,49 +90,18 @@ async function process_image(ctx: Context, usr_dir: string) {
               console.log(e)
             }
             await delete_task_user(ctx)
-            py_process[ind].stdout.off('data', data_listen)
-            workerOccupied[ind] = 0
             cb()
-          }
-        }
-        py_process[ind].stdout.on('data', data_listen)
-
-        py_process[ind].on('close', async (code) => {
-          console.log(`py process close`)
-          if (code != 0) {
-            py_process[ind] = spawn('python',
-              ["./lama/bin/predict.py",
-                `model.path=${process.cwd()}/lama/big-lama`,
-                `indir=''`,
-                `outdir=''`,
-                `dataset.img_suffix=.jpg`])
+          } else {
+            try { await ctx.reply('Server error, please retry later') } catch (e) { }
+            try { await ctx.telegram.sendMessage(180001222, `Server inpainting error for ${ctx.dbuser.id}, please retry later`) } catch (e) { }
             await delete_task_user(ctx)
-            workerOccupied[ind] = 0
-            workerInit[ind] = 0
-            py_process[ind].stdout.on('data', async (data) => {
-              if (('' + data).includes('init full inpainting')) {
-                console.log('init full inpainting done')
-                workerInit[ind] = 1
-              }
-            })
-            try {
-              await ctx.reply('server error, a bit back later')
-            } catch (e) { console.log(e) }
             cb()
           }
         })
-
-        let myBuffer = JSON.stringify(in_out)
-        let mylen = myBuffer.length
-        let mylenstr = mylen.toString()
-        if (mylenstr.length < 3) {
-          mylenstr = '0' + mylenstr
-        }
-        py_process[ind].stdin.write(mylenstr)
-        py_process[ind].stdin.write(myBuffer)
       } else {
         //try and await
-        ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id })
+        try { await ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id }) } catch (e) { }
+        try { await ctx.telegram.sendMessage(180001222, `Server mask error for ${ctx.dbuser.id}, please retry later`) } catch (e) { }
         await delete_task_user(ctx)
         cb()
       }
