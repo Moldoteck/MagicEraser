@@ -48,7 +48,7 @@ async function delete_task_user(ctx: Context) {
 async function process_image(ctx: Context, usr_dir: string) {
   let msg = await ctx.reply(`${ctx.i18n.t('queue_task')}`)
   q.push(async (cb) => {
-    try { await ctx.deleteMessage(msg.message_id) } catch (e) { }
+    ctx.deleteMessage(msg.message_id).catch((e) => { })
     let msgexec = await ctx.reply(`${ctx.i18n.t('execution_task')}`)
 
     const pythonProcess = spawn('python3',
@@ -78,34 +78,30 @@ async function process_image(ctx: Context, usr_dir: string) {
           console.log(`stderr: ${data}`)
         })
         // py_process.stdout.on('data', async (data) => {
-          // console.log(`out: ${data}`)
+        // console.log(`out: ${data}`)
         // })
         py_process.on('close', async (code) => {
           console.log(`Finished painting for ${usr_dir} with code ${code}`)
           if (code == 0) {
-            try { await ctx.deleteMessage(msgexec.message_id) } catch (e) { }
-            try {
-              let myfile = `${process.cwd()}/${usr_dir}/f_1/out/f_mask.png`
-              if (fs.existsSync(myfile)) {
-                await ctx.replyWithChatAction('upload_document')
-                await ctx.replyWithDocument({ source: myfile, filename: 'result.png' })
-              }
-            } catch (e) {
-              console.log(e)
+            ctx.deleteMessage(msgexec.message_id).catch(e => { })
+
+            let myfile = `${process.cwd()}/${usr_dir}/f_1/out/f_mask.png`
+            if (fs.existsSync(myfile)) {
+              ctx.replyWithChatAction('upload_document').catch(e => { })
+              ctx.replyWithDocument({ source: myfile, filename: 'result.png' }).catch(e => { })
             }
             await delete_task_user(ctx)
             cb()
           } else {
-            try { await ctx.reply('Server error, please retry later') } catch (e) { }
-            try { await ctx.telegram.sendMessage(180001222, `Server inpainting error for ${ctx.dbuser.id}, please retry later`) } catch (e) { }
+            ctx.reply('Server error, please retry later').catch(e => { })
+            ctx.telegram.sendMessage(180001222, `Server inpainting error for ${ctx.dbuser.id}, please retry later`).catch(e => { })
             await delete_task_user(ctx)
             cb()
           }
         })
       } else {
-        //try and await
-        try { await ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id }) } catch (e) { }
-        try { await ctx.telegram.sendMessage(180001222, `Server mask error for ${ctx.dbuser.id}, please retry later`) } catch (e) { }
+        ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id }).catch(e => { })
+        ctx.telegram.sendMessage(180001222, `Server mask error for ${ctx.dbuser.id}, please retry later`).catch(e => { })
         await delete_task_user(ctx)
         cb()
       }
@@ -167,7 +163,7 @@ export async function processPhoto(ctx: Context) {
           console.log(`Starting mask extraction for ${usr_dir}`)
 
           chatAction(ctx)
-          await process_image(ctx, usr_dir)
+          process_image(ctx, usr_dir)
         }
       }
     } else {
@@ -188,7 +184,7 @@ export async function setProcessLimit(ctx: Context) {
 export async function countAllUsers(ctx: Context) {
   if (ctx.message.from.id == 180001222) {
     let users = await countUsers()
-    ctx.reply('Chats ' + users)
+    ctx.reply('Chats ' + users).catch(e => { })
   }
 }
 
@@ -202,11 +198,7 @@ export async function resetLimits(ctx: Context) {
 export async function sendSegmentationResult(ctx: Context) {
   let usr_dir = `data_folder/${ctx.dbuser.id}`;
   let photo = `${process.cwd()}/${usr_dir}/f_1/temp/f_mask_confirm.png`
-  try {
-    if (fs.existsSync(photo)) {
-      await ctx.replyWithPhoto({ source: photo, filename: 'segmentation' })
-    }
-  } catch (e) {
-    console.log(e)
+  if (fs.existsSync(photo)) {
+    ctx.replyWithPhoto({ source: photo, filename: 'segmentation' }).catch(e => { })
   }
 }
