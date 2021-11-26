@@ -1,5 +1,5 @@
 MagicEraser - Telegram Bot for removing objects from pictures<br>
-<a href="https://t.me/MagicEraser">@MagicEraser</a><br>
+<a href="https://t.me/MagicEraserBot">@MagicEraserBot</a><br>
 Just send two photos:<br>
 <b>Bot</b> can delete objects from your photos, just follow next steps:<br>
 1- Send original image<br>
@@ -21,3 +21,4 @@ Also, please, consider looking at `.env.sample`.
 MIT — use for any purpose. Would be great if you could leave a note about the original developers. Thanks!
 
 Inspired from: https://github.com/backmeupplz/telegraf-template
+Big thanks to https://github.com/saic-mdal/lama for amazing DeepLearning models
