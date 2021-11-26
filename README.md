@@ -20,5 +20,5 @@ Also, please, consider looking at `.env.sample`.
 
 MIT — use for any purpose. Would be great if you could leave a note about the original developers. Thanks!
 
-Inspired from: https://github.com/backmeupplz/telegraf-template
+Inspired from: https://github.com/backmeupplz/telegraf-template <br/>
 Big thanks to https://github.com/saic-mdal/lama for amazing DeepLearning models
