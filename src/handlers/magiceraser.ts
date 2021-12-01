@@ -61,7 +61,8 @@ async function process_image(ctx: Context, usr_dir: string) {
       console.log(`stderr: ${data}`)
     })
 
-    pythonProcess.on('close', async (code) => {
+    await new Promise( (resolve) => {
+      pythonProcess.on('close', async (code) => {
       console.log(`Finished mask extraction for ${usr_dir} with code ${code}`)
       if (code == 0) {
         fs.copyFileSync(`${usr_dir}/f_1/temp/f.jpg`, `${usr_dir}/f_1/in/f.jpg`)
@@ -89,7 +90,8 @@ async function process_image(ctx: Context, usr_dir: string) {
         py_process.stderr.on('data', async (data) => {
           proc_out_err+=data
         })
-        py_process.on('close', async (code) => {
+        await new Promise( (resolve) => {
+          py_process.on('close', async (code) => {
           console.log(`Finished painting for ${usr_dir} with code ${code}`)
           if (code == 0) {
             ctx.deleteMessage(msgexec.message_id).catch(e => { })
@@ -111,14 +113,14 @@ async function process_image(ctx: Context, usr_dir: string) {
             await delete_task_user(ctx)
             cb()
           }
-        })
+        }) })
       } else {
         ctx.reply(`${ctx.i18n.t('painting_error')}`, { reply_to_message_id: ctx.message.message_id }).catch(e => { })
         ctx.telegram.sendMessage(180001222, `Server mask error for ${ctx.dbuser.id}, please retry later`).catch(e => { })
         await delete_task_user(ctx)
         cb()
       }
-    })
+    }) })
   })
 }
 
