@@ -74,13 +74,15 @@ async function process_image(ctx: Context, usr_dir: string) {
             `indir='${process.cwd()}/${usr_dir}/f_1/in/'`,
             `outdir='${process.cwd()}/${usr_dir}/f_1/out/'`,
             `dataset.img_suffix=.jpg`])
-        py_process.stderr.on('data', async (data) => {
-          console.log(`stderr: ${data}`)
-        })
         let proc_out = ''
         py_process.stdout.on('data', async (data) => {
-       // console.log(`out: ${data}`)
+          // console.log(`out: ${data}`)
           proc_out+=data
+        })
+        
+        py_process.on('error', function(err) {
+          console.log('Full err: ' + err)
+          ctx.telegram.sendMessage(180001222, `Full err: ${err}`).catch(e => { })
         })
         
         let proc_out_err = ''
