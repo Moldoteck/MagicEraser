@@ -77,8 +77,15 @@ async function process_image(ctx: Context, usr_dir: string) {
         py_process.stderr.on('data', async (data) => {
           console.log(`stderr: ${data}`)
         })
+        let proc_out = ''
         py_process.stdout.on('data', async (data) => {
-        console.log(`out: ${data}`)
+       // console.log(`out: ${data}`)
+          proc_out+=data
+        })
+        
+        let proc_out_err = ''
+        py_process.stderr.on('data', async (data) => {
+          proc_out_err+=data
         })
         py_process.on('close', async (code) => {
           console.log(`Finished painting for ${usr_dir} with code ${code}`)
@@ -93,8 +100,9 @@ async function process_image(ctx: Context, usr_dir: string) {
             await delete_task_user(ctx)
             cb()
           } else {
-            ctx.reply('Server error, please retry later').catch(e => { })
-            ctx.telegram.sendMessage(180001222, `Server inpainting error for ${ctx.dbuser.id}, please retry later`).catch(e => { })
+            ctx.reply('Server error, please retry later, we are analyzing the problem').catch(e => { })
+            ctx.telegram.sendMessage(180001222, `Server inpainting error for ${ctx.dbuser.id}, check please`).catch(e => { })
+            ctx.telegram.sendMessage(180001222, `Here is what system err have printed: ${proc_out_err}`).catch(e => { })
             await delete_task_user(ctx)
             cb()
           }
