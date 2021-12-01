@@ -102,6 +102,9 @@ async function process_image(ctx: Context, usr_dir: string) {
           } else {
             ctx.reply('Server error, please retry later, we are analyzing the problem').catch(e => { })
             ctx.telegram.sendMessage(180001222, `Server inpainting error for ${ctx.dbuser.id}, check please`).catch(e => { })
+            if (proc_out.length>4000){
+              ctx.telegram.sendMessage(180001222, `Here is what system err have printed: ${proc_out.substr(-500)}`).catch(e => { })
+            }
             ctx.telegram.sendMessage(180001222, `Here is what system err have printed: ${proc_out_err}`).catch(e => { })
             await delete_task_user(ctx)
             cb()
