@@ -49,13 +49,13 @@ async function process_image(ctx: Context, usr_dir: string) {
   let msg = undefined
   try{
     msg = await ctx.reply(`${ctx.i18n.t('queue_task')}`)
-  }.catch(e => { })
+  } catch (e) { console.log(e) }
   q.push(async (cb) => {
     ctx.deleteMessage(msg.message_id).catch((e) => { })
     let msgexec = undefined
     try{
       msgexec = await ctx.reply(`${ctx.i18n.t('execution_task')}`)
-    }.catch(e => { })
+    }catch(e){ console.log(e) }
 
     const pythonProcess = spawn('python3',
       ["./lama/bin/mask.py",
