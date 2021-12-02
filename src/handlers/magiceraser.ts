@@ -46,10 +46,16 @@ async function delete_task_user(ctx: Context) {
 }
 
 async function process_image(ctx: Context, usr_dir: string) {
-  let msg = await ctx.reply(`${ctx.i18n.t('queue_task')}`)
+  let msg = undefined
+  try{
+    msg = await ctx.reply(`${ctx.i18n.t('queue_task')}`)
+  }.catch(e => { })
   q.push(async (cb) => {
     ctx.deleteMessage(msg.message_id).catch((e) => { })
-    let msgexec = await ctx.reply(`${ctx.i18n.t('execution_task')}`)
+    let msgexec = undefined
+    try{
+      msgexec = await ctx.reply(`${ctx.i18n.t('execution_task')}`)
+    }.catch(e => { })
 
     const pythonProcess = spawn('python3',
       ["./lama/bin/mask.py",
@@ -145,14 +151,14 @@ function createFolderStructure(ctx: Context) {
 
 export async function processPhoto(ctx: Context) {
   if (ctx.dbuser.jobs >= processingLimit) {
-    ctx.reply(`${ctx.i18n.t('wait_task')}`)
+    ctx.reply(`${ctx.i18n.t('wait_task')}`).catch(e => { })
     return
   }
 
   let file = await get_file(ctx)
   if (file) {
     if ('document' in ctx.message && ctx.dbuser.id != 180001222) {
-      ctx.reply(`${ctx.i18n.t('unsupported_file')}`)
+      ctx.reply(`${ctx.i18n.t('unsupported_file')}`).catch(e => { })
       return
     }
     let result = await needle('get', `https://api.telegram.org/file/bot${process.env.TOKEN}/${file.file_path}`)
@@ -182,7 +188,7 @@ export async function processPhoto(ctx: Context) {
         }
       }
     } else {
-      ctx.reply(`${ctx.i18n.t('first_image')}`, { reply_to_message_id: ctx.message.message_id })
+      ctx.reply(`${ctx.i18n.t('first_image')}`, { reply_to_message_id: ctx.message.message_id }).catch(e => { })
     }
   }
 }
@@ -191,7 +197,7 @@ export async function setProcessLimit(ctx: Context) {
   if (ctx.dbuser.id == 180001222) {
     if ('text' in ctx.message) {
       processingLimit = parseInt(ctx.message.text)
-      ctx.reply(`Processing limit set to ${processingLimit}`)
+      ctx.reply(`Processing limit set to ${processingLimit}`).catch(e => { })
     }
   }
 }
@@ -199,7 +205,7 @@ export async function setProcessLimit(ctx: Context) {
 export async function countAllUsers(ctx: Context) {
   if (ctx.message.from.id == 180001222) {
     let users = await countUsers()
-    ctx.reply('Chats ' + users).catch(e => { })
+    ctx.reply('Chats ' + users).catch(e => { }).catch(e => { })
   }
 }
 
