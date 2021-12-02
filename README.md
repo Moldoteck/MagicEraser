@@ -22,3 +22,4 @@ MIT — use for any purpose. Would be great if you could leave a note about the 
 
 Inspired from: https://github.com/backmeupplz/telegraf-template <br/>
 Big thanks to https://github.com/saic-mdal/lama for amazing DeepLearning models
+Model and pre-processing code can be found here: https://github.com/Moldoteck/lama
