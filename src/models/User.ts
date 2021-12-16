@@ -34,6 +34,10 @@ export async function emptyLimits() {
   await UserModel.updateMany({}, {"$set":{"jobs": 0}})
 }
 
+export async function emptyLimitsUser(id: number) {
+  await UserModel.updateOne({ id }, {"$set":{"jobs": 0}})
+}
+
 export async function countUsers() {
   return await UserModel.countDocuments({})
 }
