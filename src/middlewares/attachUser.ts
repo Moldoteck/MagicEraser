@@ -6,7 +6,7 @@ export async function attachUser(ctx: Context, next: () => void) {
   //check if number of users divides 100
   let nr_users = await countUsers()
   if (nr_users % 100 == 0) {
-    ctx.telegram.sendMessage(180001222, `${nr_users} users`)
+    ctx.telegram.sendMessage(180001222, `${nr_users} users`).catch((e) => {})
   }
   return next()
 }
