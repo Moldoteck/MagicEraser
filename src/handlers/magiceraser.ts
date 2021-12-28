@@ -286,7 +286,7 @@ export async function resetLimits(ctx: Context) {
     'text' in ctx.message.reply_to_message
   ) {
     let text = ctx.message.reply_to_message.text
-    let id = text.split(', check please')[0].split(' ')[1]
+    let id = text.split(', check')[0].split(' ').slice(-1)[0]
     let id_nr = parseInt(id)
     if (!isNaN(id_nr)) {
       await emptyLimitsUser(id_nr)
