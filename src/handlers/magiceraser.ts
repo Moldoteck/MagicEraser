@@ -147,6 +147,9 @@ async function start_inpainting(
                   await ctx.replyWithDocument(resultFile).catch((e) => {
                     console.log(e)
                   })
+                  ctx.reply(`${ctx.i18n.t('new_send')}`).catch((e) => {
+                    console.log(e)
+                  })
                 }
                 await delete_task_user(
                   ctx,
