@@ -12,7 +12,12 @@ import i18n from '@/helpers/i18n'
 import languageMenu from '@/menus/language'
 import sendHelp from '@/handlers/help'
 import startMongo from '@/helpers/startMongo'
-import { handleNew, handleReset, processPhoto } from './handlers/magiceraser'
+import {
+  countAllUsers,
+  handleNew,
+  handleReset,
+  processPhoto,
+} from './handlers/magiceraser'
 
 async function runApp() {
   console.log('Starting app...')
@@ -33,6 +38,7 @@ async function runApp() {
   bot.command('language', handleLanguage)
   bot.command('new', handleNew)
   bot.command('reset', handleReset)
+  bot.command('countChats', countAllUsers)
   bot.on(':photo', processPhoto)
   // Errors
   bot.catch(console.error)

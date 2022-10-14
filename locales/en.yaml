@@ -12,7 +12,7 @@ help: |
   <b>Send /language</b> to change language
 language: Please, select the language.
 language_selected: <b>Bot</b> now speaks English.
-first_image: Original image saved. Now draw what you want to remove and send the result as a reply
+first_image: Original image saved. Now draw what you want to remove and send the result
 unsupported_file: Files are unsupported now. Stay tuned!
 wait_task: Wait until previous task is finished!
 painting_error: Error during painting, try again later
