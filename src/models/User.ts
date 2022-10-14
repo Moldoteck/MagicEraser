@@ -1,41 +1,28 @@
-import { prop, getModelForClass } from '@typegoose/typegoose'
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
 
+@modelOptions({ schemaOptions: { timestamps: true } })
 export class User {
   @prop({ required: true, index: true, unique: true })
-  id: number
-
+  id!: number
   @prop({ required: true, default: 'en' })
-  language: string
-  
-  @prop({ required: true, default: 0 })
-  jobs: number
+  language!: string
+  @prop({ required: false, default: 0 })
+  jobs!: number
+  @prop({ required: false, default: '' })
+  originalPhoto!: string
 }
 
-// Get User model
-const UserModel = getModelForClass(User, {
-  schemaOptions: { timestamps: true },
-})
+const UserModel = getModelForClass(User)
 
-// Get or create user
-export async function findUser(id: number) {
-  let user = await UserModel.findOne({ id })
-  if (!user) {
-    // Try/catch is used to avoid race conditions
-    try {
-      user = await new UserModel({ id }).save()
-    } catch (err) {
-      user = await UserModel.findOne({ id })
+export function findOrCreateUser(id: number) {
+  return UserModel.findOneAndUpdate(
+    { id },
+    {},
+    {
+      upsert: true,
+      new: true,
     }
-  }
-  return user
-}
-
-export async function emptyLimits() {
-  await UserModel.updateMany({}, {"$set":{"jobs": 0}})
-}
-
-export async function emptyLimitsUser(id: number) {
-  await UserModel.updateOne({ id }, {"$set":{"jobs": 0}})
+  )
 }
 
 export async function countUsers() {

@@ -1,14 +1,15 @@
-import { countUsers, findUser } from '@/models'
-import { Context } from 'telegraf'
+import { NextFunction } from 'grammy'
+import { findOrCreateUser } from '@/models/User'
+import Context from '@/models/Context'
 
-export async function attachUser(ctx: Context, next: () => void) {
-  
-  let old_nr_users = await countUsers()
-  ctx.dbuser = await findUser(ctx.from.id)
-  //check if number of users divides 100
-  let new_nr_users = await countUsers()
-  if (old_nr_users!=new_nr_users &&  new_nr_users % 100 == 0) {
-    ctx.telegram.sendMessage(180001222, `${new_nr_users} users`).catch((e) => {})
+export default async function attachUser(ctx: Context, next: NextFunction) {
+  if (!ctx.from) {
+    throw new Error('No from field found')
   }
+  const user = await findOrCreateUser(ctx.from.id)
+  if (!user) {
+    throw new Error('User not found')
+  }
+  ctx.dbuser = user
   return next()
 }

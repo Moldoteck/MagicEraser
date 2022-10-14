@@ -1,41 +1,53 @@
 {
-  "name": "magic-eraser",
+  "name": "telegram-bot-starter",
   "version": "1.0.0",
-  "description": "Telegram bot for removing objects from photos",
+  "description": "Telegram bot starter based on grammY",
   "main": "dist/app.js",
-  "repository": "https://github.com/Moldoteck/telegraf-template",
+  "repository": "https://github.com/Moldoteck/MagicEraser",
   "author": "Moldoteck <moldotecko@gmail.com>",
   "license": "MIT",
-  "private": false,
   "scripts": {
     "distribute": "yarn build-ts && node dist/app.js",
-    "develop": "concurrently -k -i -p \"[{name}]\" -n \"Node,TypeScript\" -c \"yellow.bold,cyan.bold\" \"yarn watch-js\" \"yarn watch-ts\"",
+    "develop": "tsc-watch --skipLibCheck --onSuccess 'node dist/app.js'",
     "build-ts": "tsc --skipLibCheck",
-    "watch-ts": "tsc -w --skipLibCheck",
-    "watch-js": "nodemon dist/app.js"
-  },
-  "devDependencies": {
-    "@types/mongoose": "^5.10.18",
-    "@types/node": "^15.12.1",
-    "concurrently": "^6.2.0",
-    "nodemon": "^2.0.7",
-    "ansi-regex": ">=5.0.1",
-    "mpath": ">=0.8.4",
-    "mquery": ">=3.2.3"
+    "pretty": "prettier --check src",
+    "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^7.6.1",
+    "@grammyjs/i18n": "^0.5.0",
+    "@grammyjs/menu": "^1.0.4",
+    "@grammyjs/runner": "^1.0.3",
     "dotenv": "^10.0.0",
-    "glob": "^7.2.0",
+    "envalid": "^7.2.2",
+    "grammy": "^1.5.0",
+    "grammy-middlewares": "^1.0.11",
+    "mongoose": "^6.1.0",
+    "queue": "^6.0.2",
+    "uuid": "^9.0.0",
+    "needle": "^3.1.0"
+  },
+  "devDependencies": {
+    "@typegoose/typegoose": "^9.3.1",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^16.11.12",
+    "@types/uuid": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/parser": "^5.6.0",
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-no-relative-import-paths": "^1.0.8",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
     "module-alias": "^2.2.2",
-    "mongoose": "5.10.18",
-    "needle": "3.0.0",
-    "telegraf": "^4.3.0",
-    "telegraf-i18n": "^6.6.0",
-    "typescript": "^4.3.5",
-    "queue": "6.0.2"
+    "prettier": "^2.5.1",
+    "source-map-support": "^0.5.21",
+    "tsc-watch": "^4.5.0",
+    "typescript": "^4.5.2"
   },
   "_moduleAliases": {
     "@": "dist"
-  }
+  },
+  "packageManager": "yarn@3.1.0"
 }

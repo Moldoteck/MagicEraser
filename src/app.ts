@@ -1,40 +1,45 @@
-import { localeActions } from './handlers/language'
-// Setup @/ aliases for modules
 import 'module-alias/register'
-// Config dotenv
-import * as dotenv from 'dotenv'
-dotenv.config({ path: `${__dirname}/../.env` })
-// Dependencies
-import { bot } from '@/helpers/bot'
-import { ignoreOldMessageUpdates } from '@/middlewares/ignoreOldMessageUpdates'
-import { sendHelp } from '@/handlers/sendHelp'
-import { i18n, attachI18N } from '@/helpers/i18n'
-import { setLanguage, sendLanguage } from '@/handlers/language'
-import { attachUser } from '@/middlewares/attachUser'
-import { countAllUsers, processPhoto, resetLimits, sendSegmentationResult, setProcessLimit } from './handlers/magiceraser'
-import { emptyLimits } from './models'
+import 'reflect-metadata'
+import 'source-map-support/register'
 
-// Middlewares
-bot.use(ignoreOldMessageUpdates)
-bot.use(attachUser)
-bot.use(i18n.middleware(), attachI18N)
-// Commands
-bot.command(['help', 'start'], sendHelp)
-bot.command('language', sendLanguage)
-bot.command('limit', setProcessLimit)
-bot.command('countChats', countAllUsers)
-bot.command('reset', resetLimits)
-bot.command('segmentation', sendSegmentationResult)
+import { ignoreOld, sequentialize } from 'grammy-middlewares'
+import { run } from '@grammyjs/runner'
+import attachUser from '@/middlewares/attachUser'
+import bot from '@/helpers/bot'
+import configureI18n from '@/middlewares/configureI18n'
+import handleLanguage from '@/handlers/language'
+import i18n from '@/helpers/i18n'
+import languageMenu from '@/menus/language'
+import sendHelp from '@/handlers/help'
+import startMongo from '@/helpers/startMongo'
+import { handleNew, handleReset, processPhoto } from './handlers/magiceraser'
 
-
-bot.on('photo',processPhoto)
-bot.on('message',processPhoto)
-// Actions
-bot.action(localeActions, setLanguage)
-// Errors
-bot.catch(console.error)
-// Start bot
-bot.launch().then(async () => {
-  await emptyLimits()
+async function runApp() {
+  console.log('Starting app...')
+  // Mongo
+  await startMongo()
+  console.log('Mongo connected')
+  bot
+    // Middlewares
+    .use(sequentialize())
+    .use(ignoreOld())
+    .use(attachUser)
+    .use(i18n.middleware())
+    .use(configureI18n)
+    // Menus
+    .use(languageMenu)
+  // Commands
+  bot.command(['help', 'start'], sendHelp)
+  bot.command('language', handleLanguage)
+  bot.command('new', handleNew)
+  bot.command('reset', handleReset)
+  bot.on(':photo', processPhoto)
+  // Errors
+  bot.catch(console.error)
+  // Start bot
+  await bot.init()
+  run(bot)
   console.info(`Bot ${bot.botInfo.username} is up and running`)
-})
+}
+
+void runApp()

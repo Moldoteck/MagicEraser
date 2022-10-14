@@ -1,18 +1,11 @@
-import I18N from 'telegraf-i18n'
-import { Context } from 'telegraf'
-const dirtyI18N = require('telegraf-i18n')
+import { I18n } from '@grammyjs/i18n'
+import { cwd } from 'process'
+import { resolve } from 'path'
 
-export const i18n = new dirtyI18N({
-  directory: `${__dirname}/../../locales`,
+const i18n = new I18n({
+  defaultLanguageOnMissing: true,
+  directory: resolve(cwd(), 'locales'),
   defaultLanguage: 'en',
-  sessionName: 'session',
-  useSession: false,
-  allowMissing: false,
-}) as I18N
+})
 
-export function attachI18N(ctx: Context, next: () => void) {
-  const anyI18N = ctx.i18n as any
-  anyI18N.locale(ctx.dbuser.language)
-  // anyI18N.locale(ctx.dbchat.language)
-  return next()
-}
+export default i18n

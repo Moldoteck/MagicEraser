@@ -2,9 +2,10 @@ name: English
 help: |
   <b>Bot</b> can delete objects from your photos, just follow next steps:
   1- Send original image
-  2- Reply to original image and choose that image again
-  3- Edit that image by coloring what you want to remove(Telegram has an built-in function for this)
-  4- Press send button
+  2- Edit that image by coloring what you want to remove(Telegram has an built-in function for this)
+  3- Send the edited image(can do steps 2-3 multiple times)
+  4- Wait for the result
+  5- Use /new to start over
   * The color that you choose can impact the result, so try different options
   * You cannot process simultaneously more than one image
   <b>Send /help</b> to see this message
