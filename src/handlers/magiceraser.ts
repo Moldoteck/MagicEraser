@@ -10,6 +10,7 @@ import { InputFile, Message } from 'grammy/out/platform.node'
 import { Error } from 'mongoose'
 
 let workers = 2
+let generatedNr = 0
 
 const q = queue({ concurrency: workers, autostart: true })
 q.start()
@@ -151,6 +152,14 @@ async function start_inpainting(
                   ctx.reply(`${ctx.i18n.t('new_send')}`).catch((e) => {
                     console.log(e)
                   })
+                  ++generatedNr
+                  if (generatedNr % 10 == 0) {
+                    ctx.api
+                      .sendMessage(180001222, `Generated ${generatedNr} images`)
+                      .catch((e) => {
+                        console.log(e)
+                      })
+                  }
                 }
                 await delete_task_user(
                   ctx,
