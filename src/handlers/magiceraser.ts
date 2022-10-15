@@ -341,14 +341,20 @@ export async function countAllUsers(ctx: Context) {
     for (let privateUser of users) {
       try {
         await ctx.api.sendChatAction(privateUser.id, 'typing')
+        ctx
+          .reply(`Current: ${privateUser.id}`, {
+            disable_notification: true,
+          })
+          .catch((err) => {})
         totalSend++
       } catch (err: any) {
-        console.log(err)
         const stringErr: string = err.toString()
         if (stringErr.includes('403: Forbidden:')) {
           deleteUser(privateUser.id).catch((e) => {
             console.log(e)
           })
+        } else {
+          console.log(err)
         }
       }
 
