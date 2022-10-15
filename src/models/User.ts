@@ -24,6 +24,10 @@ export function findOrCreateUser(id: number) {
     }
   )
 }
+//delete user
+export function deleteUser(id: number) {
+  return UserModel.findOneAndDelete({ id })
+}
 
 export async function countUsers() {
   return await UserModel.countDocuments({})

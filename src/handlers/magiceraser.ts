@@ -1,4 +1,4 @@
-import { countUsers, findAllUsers } from '@/models/User'
+import { countUsers, deleteUser, findAllUsers } from '@/models/User'
 import { spawn } from 'child_process'
 import { writeFile } from 'fs'
 import Context from '@/models/Context'
@@ -7,6 +7,7 @@ const needle = require('needle')
 const queue = require('queue')
 import { v4 } from 'uuid'
 import { InputFile, Message } from 'grammy/out/platform.node'
+import { Error } from 'mongoose'
 
 let workers = 2
 
@@ -332,9 +333,34 @@ export async function setProcessLimit(ctx: Context) {
 }
 
 export async function countAllUsers(ctx: Context) {
-  if (ctx.dbuser.id == 180001222) {
-    let users = await countUsers()
-    ctx.reply('Users ' + users).catch((e) => {})
+  if (ctx.from?.id == 180001222) {
+    let total = 0
+    let totalSend = 0
+    let users = await findAllUsers()
+    total = users.length
+    for (let privateUser of users) {
+      try {
+        await ctx.api.sendChatAction(privateUser.id, 'typing')
+        totalSend++
+      } catch (err: any) {
+        console.log(err)
+        const stringErr: string = err.toString()
+        if (stringErr.includes('403: Forbidden:')) {
+          deleteUser(privateUser.id).catch((e) => {
+            console.log(e)
+          })
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 4000))
+    }
+    ctx
+      .reply(`Total users ${totalSend}:${total}`, {
+        disable_notification: true,
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 }
 
@@ -401,7 +427,7 @@ export async function notifyAllChats(ctx: Context) {
           console.log(err)
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 4000))
         if (canSend) {
           ctx.api
             .sendMessage(privateUser.id, msg, { disable_notification: true })
@@ -409,7 +435,7 @@ export async function notifyAllChats(ctx: Context) {
               console.log(err)
               totalSend--
               ctx
-                .reply(err.message, { disable_notification: true })
+                .reply(err.toString(), { disable_notification: true })
                 .catch((err) => {
                   console.log(err)
                   console.log('user id ', privateUser.id)

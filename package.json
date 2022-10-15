@@ -22,9 +22,9 @@
     "grammy": "^1.5.0",
     "grammy-middlewares": "^1.0.11",
     "mongoose": "^6.1.0",
+    "needle": "^3.1.0",
     "queue": "^6.0.2",
-    "uuid": "^9.0.0",
-    "needle": "^3.1.0"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@typegoose/typegoose": "^9.3.1",
