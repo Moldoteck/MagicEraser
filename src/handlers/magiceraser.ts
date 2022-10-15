@@ -358,7 +358,7 @@ export async function countAllUsers(ctx: Context) {
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 4000))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
     ctx
       .reply(`Total users ${totalSend}:${total}`, {
