@@ -344,7 +344,10 @@ export async function countAllUsers(ctx: Context) {
         totalSend++
       } catch (err: any) {
         const stringErr: string = err.toString()
-        if (stringErr.includes('403: Forbidden:')) {
+        if (
+          stringErr.includes('403: Forbidden:') ||
+          stringErr.includes('chat not found')
+        ) {
           console.log('Will delete')
           deleteUser(privateUser.id).catch((e) => {
             console.log(e)
