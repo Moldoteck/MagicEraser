@@ -341,24 +341,22 @@ export async function countAllUsers(ctx: Context) {
     for (let privateUser of users) {
       try {
         await ctx.api.sendChatAction(privateUser.id, 'typing')
-        ctx
-          .reply(`Current: ${privateUser.id}`, {
-            disable_notification: true,
-          })
-          .catch((err) => {})
         totalSend++
       } catch (err: any) {
         const stringErr: string = err.toString()
         if (stringErr.includes('403: Forbidden:')) {
+          console.log('Will delete')
           deleteUser(privateUser.id).catch((e) => {
             console.log(e)
           })
+        } else if (stringErr.includes('429: Too Many:')) {
+          console.log('Too many requests')
         } else {
           console.log(err)
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 50))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
     ctx
       .reply(`Total users ${totalSend}:${total}`, {
