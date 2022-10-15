@@ -400,6 +400,8 @@ export async function notifyAllChats(ctx: Context) {
         } catch (err) {
           console.log(err)
         }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000))
         if (canSend) {
           ctx.api
             .sendMessage(privateUser.id, msg, { disable_notification: true })
@@ -415,7 +417,6 @@ export async function notifyAllChats(ctx: Context) {
             })
           totalSend++
           //sleep 1 second
-          await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       }
       ctx
