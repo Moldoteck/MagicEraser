@@ -16,6 +16,7 @@ import {
   countAllUsers,
   handleNew,
   handleReset,
+  notifyAllChats,
   processPhoto,
 } from './handlers/magiceraser'
 
@@ -39,6 +40,7 @@ async function runApp() {
   bot.command('new', handleNew)
   bot.command('reset', handleReset)
   bot.command('countChats', countAllUsers)
+  bot.command('notify', notifyAllChats)
   bot.on(':photo', processPhoto)
   // Errors
   bot.catch(console.error)

@@ -28,3 +28,7 @@ export function findOrCreateUser(id: number) {
 export async function countUsers() {
   return await UserModel.countDocuments({})
 }
+
+export async function findAllUsers() {
+  return await UserModel.find({})
+}

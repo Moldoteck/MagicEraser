@@ -1,4 +1,4 @@
-import { countUsers } from '@/models/User'
+import { countUsers, findAllUsers } from '@/models/User'
 import { spawn } from 'child_process'
 import { writeFile } from 'fs'
 import Context from '@/models/Context'
@@ -382,4 +382,49 @@ export async function handleReset(ctx: Context) {
   ctx.reply(`Ok`).catch((e) => {
     console.log(e)
   })
+}
+
+export async function notifyAllChats(ctx: Context) {
+  if (ctx.from?.id == 180001222 && ctx.message?.reply_to_message?.text) {
+    let msg = ctx.message.reply_to_message.text
+    if (msg) {
+      let total = 0
+      let totalSend = 0
+      let users = await findAllUsers()
+      total = users.length
+      for (let privateUser of users) {
+        let canSend = false
+        try {
+          await ctx.api.sendChatAction(privateUser.id, 'typing')
+          canSend = true
+        } catch (err) {
+          console.log(err)
+        }
+        if (canSend) {
+          ctx.api
+            .sendMessage(privateUser.id, msg, { disable_notification: true })
+            .catch((err) => {
+              console.log(err)
+              totalSend--
+              ctx
+                .reply(err.message, { disable_notification: true })
+                .catch((err) => {
+                  console.log(err)
+                  console.log('user id ', privateUser.id)
+                })
+            })
+          totalSend++
+          //sleep 1 second
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+        }
+      }
+      ctx
+        .reply(`Total sent ${totalSend}:${total}`, {
+          disable_notification: true,
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }
 }
