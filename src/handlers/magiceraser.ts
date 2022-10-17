@@ -255,6 +255,29 @@ function createFolderStructure(ctx: Context) {
 }
 
 export async function processPhoto(ctx: Context) {
+  let oldPhotos = ctx.dbuser.oldPhotos
+  //delete photos that are older than 1 day
+  let now = new Date().getTime()
+  for (let i = 0; i < oldPhotos.length; i++) {
+    let key = Object.keys(oldPhotos[i])[0]
+    const usr_dir = `./data_folder/${ctx.dbuser.id}`
+    if (now - oldPhotos[i][key].getTime() > 86400000) {
+      if (fs.existsSync(`${usr_dir}/${key}`)) {
+        fs.rmSync(`${usr_dir}/${key}`, { recursive: true, force: true })
+      }
+
+      oldPhotos.splice(i, 1)
+      i--
+    }
+  }
+  ctx.dbuser.oldPhotos = oldPhotos
+  await ctx.dbuser.save()
+
+  if (oldPhotos.length == 0) {
+    ctx.dbuser.originalPhoto = ''
+    await ctx.dbuser.save()
+  }
+
   if (ctx.dbuser.originalPhoto.length == 0) {
     let fileInfo = await get_file(ctx)
     if (fileInfo) {
@@ -269,6 +292,9 @@ export async function processPhoto(ctx: Context) {
 
       const toSave = `${usr_dir}/${unique_id}/f.jpg`
       await writeFile(`${toSave}`, result.body, () => {})
+
+      ctx.dbuser.oldPhotos.push({ [unique_id]: new Date() })
+      await ctx.dbuser.save()
 
       ctx
         .reply(`${ctx.i18n.t('first_image')}`, {

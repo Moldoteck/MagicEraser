@@ -1,5 +1,6 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
 
+export type DateMap = { [key: string]: Date }
 @modelOptions({ schemaOptions: { timestamps: true } })
 export class User {
   @prop({ required: true, index: true, unique: true })
@@ -10,7 +11,12 @@ export class User {
   jobs!: number
   @prop({ required: false, default: '' })
   originalPhoto!: string
+
+  @prop({ required: false, default: [] })
+  oldPhotos!: DateMap[]
 }
+
+//type where key is string and value is date
 
 const UserModel = getModelForClass(User)
 
