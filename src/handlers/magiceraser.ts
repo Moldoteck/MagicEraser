@@ -384,7 +384,7 @@ export async function countAllUsers(ctx: Context) {
           stringErr.includes('chat not found')
         ) {
           console.log('Will delete')
-          deleteUser(privateUser.id).catch((e) => {
+          deleteUser(privateUser.id).catch((e: any) => {
             console.log(e)
           })
         } else if (stringErr.includes('429: Too Many:')) {
