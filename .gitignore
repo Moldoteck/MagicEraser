@@ -11,3 +11,7 @@ dist
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+#data
+data_folder/*
+!data_folder/.keep
