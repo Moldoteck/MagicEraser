@@ -1,5 +1,5 @@
 MagicEraser - Telegram Bot for removing objects from pictures<br>
-<a href="https://t.me/MagicEraserBot">@MagicEraserBot</a><br>
+<a href="https://t.me/MagicEraserBot"><del>@MagicEraserBot</del></a> - not working due to running cost<br>
 Just send two photos:<br>
 <b>Bot</b> can delete objects from your photos, just follow next steps:<br>
 1- Send original image<br>
